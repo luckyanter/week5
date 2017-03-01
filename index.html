@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Timed game</title>
+	<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+</head>
+<body>
+<div><h2>Choose the correct answer</h2>
+<div id="start">click start to play</div>
+<div id="timeleft"></div>
+<div id="questions"></div>
+<div id="answers"></div>
+<div id="result"></div>
+
+<script type="text/javascript">
+
+$(document).ready(function() {
+
+var all = [
+	{question : "why is life hard?", answers : ["not hard","idk","ask yourself","weird"], correct : 0},
+  {question : "how is my logic?", answers : ["haha","sounds crazy","twisted","psycho"], correct : 3},
+  {question : "who is to be blamed?", answers : ["i am having fun","i regret it","lol","wow"], correct : 1},
+  {question : "what is the solution?", answers: ["none","nun","many ways","think again"], correct : 2},
+];
+
+var time = 10;
+var num = 0;
+var right = 0;
+var wrong = 0;
+var noAnswer = 0;
+var intervalId;
+
+function reset() {
+    time = 10;
+    num = 0;
+    right = 0;
+    wrong = 0;
+    noAnswer = 0;
+}
+
+function start() {
+  $("#start").on("click", function() {
+	display();
+	reset();
+	});
+}
+
+function display() {
+  looping();
+  $("#answers").on("click", function(){ 
+    respond();
+  })
+}
+
+function looping() {
+     $("#questions").append(all[num].question);
+     intervalId = setInterval(countDown, 1000);
+     console.log(time);  
+     for (var i = 0; i < all[num].answers.length; i++) {
+       var xanswer = all[num].answers[i];
+       $(xanswer).attr("data-number", i);
+       $(xanswer).text(all[num].answers[i]);
+       $("#answers").append("<ul><li>" + xanswer + "</li></ul>");
+     }  
+  }
+
+function countDown() {
+  time--;
+  $("#timeleft").html("time left " + time);
+  if (time === 0) {
+   clean();
+  } 
+}
+
+function next() {
+  if (num < all.length - 1) {
+  num++;
+  console.log(num);
+  time = 10;
+  looping();
+  $("#result").empty();
+  }
+  else {
+    console.log(num);
+    end();
+  }
+}
+
+function clean() {
+    clearInterval(intervalId);
+    $("#questions").empty();
+    $("#answers").empty();
+    $("#result").html("loading next question");
+    setTimeout(next, 1000)
+  }
+function respond() {
+  
+  if ($(this).attr("data-number") === all[num].correct) {
+    right++
+    clean(); 
+  }
+  else {
+  	wrong++
+    clean();
+  }
+}
+
+function end() {
+  var nonanswered = all.length - (right + wrong);
+  console.log(nonanswered);
+  $("#result").html("game over. " + "correct questions: " + right + " wrong questions: " + wrong + " nonanswered questions: " + nonanswered);
+}
+
+start();
+
+})
+
+</script>
+
+</body>
+</html>
